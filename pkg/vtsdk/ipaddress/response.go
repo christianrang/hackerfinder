@@ -56,19 +56,19 @@ type LastAnalysisResults struct {
 }
 
 type LastHttpsCertificate struct {
-	Size               int           `json:"size"`
-	PublicKey          PublicKey     `json:"public_key"`
-	ThumbPrintSha256   string        `json:"thumb_print_sha_256"`
-	Tags               []string      `json:"tags"`
-	CertSignature      CertSignature `json:"cert_signature"`
-	Validity           Validity      `json:"validity"`
-	Version            string        `json:"version"`
-	Extensions         Extensions    `json:"extensions"`
-	SignatureAlgorithm string        `json:"signature_algorithm"`
-	SerialNumber       string        `json:"serial_number"`
-	Thumbprint         string        `json:"thumbprint"`
-	Issuer             map[string]string
-	Subject            map[string]string
+	Size               int               `json:"size"`
+	PublicKey          PublicKey         `json:"public_key"`
+	ThumbPrintSha256   string            `json:"thumb_print_sha_256"`
+	Tags               []string          `json:"tags"`
+	CertSignature      CertSignature     `json:"cert_signature"`
+	Validity           Validity          `json:"validity"`
+	Version            string            `json:"version"`
+	Extensions         Extensions        `json:"extensions"`
+	SignatureAlgorithm string            `json:"signature_algorithm"`
+	SerialNumber       string            `json:"serial_number"`
+	Thumbprint         string            `json:"thumbprint"`
+	Issuer             map[string]string `json:"issuer"`
+	Subject            map[string]string `json:"subject"`
 }
 
 type Extensions struct {
