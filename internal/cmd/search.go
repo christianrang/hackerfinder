@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -21,21 +20,11 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			client := vtsdk.CreateClient(configuration.VTConfig)
 
-			t := table.NewWriter()
-			t.SetOutputMirror(os.Stdout)
-			t.AppendHeader(table.Row{"IP", "Malicious", "Suspicious", "Harmless", "Threat Level"})
-			t.AppendSeparator()
+			t := initializeTable()
 
-			for _, ip := range ips {
-				_, result, err := ipaddress.QueryIp(*client, ip)
-				if err != nil {
-					log.Fatalln(err)
-				}
-				result.Table(t)
-			}
-			fmt.Println("i get it..")
+			handleIp(client, t)
+			handleIpFile(client, t)
 
-			HandleIpFile(client, t)
 			t.Render()
 		},
 	}
@@ -59,7 +48,25 @@ func init() {
 	)
 }
 
-func HandleIpFile(client *vtsdk.Client, t table.Writer) {
+func initializeTable() table.Writer {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"IP", "Malicious", "Suspicious", "Harmless", "Threat Level"})
+	t.AppendSeparator()
+	return t
+}
+
+func handleIp(client *vtsdk.Client, t table.Writer) {
+	for _, ip := range ips {
+		_, result, err := ipaddress.QueryIp(*client, ip)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		result.Table(t)
+	}
+}
+
+func handleIpFile(client *vtsdk.Client, t table.Writer) {
 	for _, file := range ipFile {
 		data, err := os.ReadFile(file)
 		if err != nil {
