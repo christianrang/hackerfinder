@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -30,10 +31,15 @@ var (
 			t := initializeTable()
 
 			if csvFilename != "" {
+				if _, err := os.Stat(csvFilename); !errors.Is(err, os.ErrNotExist) {
+					fmt.Printf("error: file %s already exists\n", csvFilename)
+					os.Exit(1)
+				}
 				csvFile, err := os.Create(csvFilename)
 				defer csvFile.Close()
 				if err != nil {
 					fmt.Printf("error: failed to create csv file %s: %s\n", csvFilename, err)
+					os.Exit(1)
 				}
 
 				csvWriter = csv.NewWriter(csvFile)
