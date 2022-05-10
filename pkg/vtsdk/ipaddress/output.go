@@ -28,10 +28,12 @@ func (r Response) Table(t table.Writer) {
 }
 
 func (r Response) ThreatLevel() string {
-	malicious := r.Data.Attributes.LastAnalysisStats.Malicious
-	suspicious := r.Data.Attributes.LastAnalysisStats.Suspicious
-	harmless := r.Data.Attributes.LastAnalysisStats.Harmless
-	undetected := r.Data.Attributes.LastAnalysisStats.Undetected
+	var (
+		malicious  = r.Data.Attributes.LastAnalysisStats.Malicious
+		suspicious = r.Data.Attributes.LastAnalysisStats.Suspicious
+		harmless   = r.Data.Attributes.LastAnalysisStats.Harmless
+		undetected = r.Data.Attributes.LastAnalysisStats.Undetected
+	)
 
 	if malicious > suspicious && malicious > harmless && malicious > undetected {
 		return "malicious"

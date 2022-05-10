@@ -24,8 +24,9 @@ var (
 	csvWriter   *csv.Writer
 	searchCmd   = &cobra.Command{
 		Use:   "search [OPTIONS]",
-		Short: "searches virustotal",
+		Short: "searches virustotal and abuseaipdb",
 		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Searching...")
 			client := vtsdk.CreateClient(configuration.VTConfig)
 
 			t := initializeTable()

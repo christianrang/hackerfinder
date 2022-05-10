@@ -1,22 +1,23 @@
-package ipaddress
+package check
 
 import (
 	"errors"
 	"fmt"
 	"time"
 
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
+	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
 	resty "github.com/go-resty/resty/v2"
 )
 
-var _vtIpAddressUrlPath = "/api/v3/ip_addresses/%s"
+const _abuseipdbCheckUrlPath = "/api/v2/check/?ipAddress=%s"
 
-func QueryIp(client vtsdk.Client, ip string) (*resty.Response, *Response, error) {
+func QueryCheck(client abuseipdbsdk.Client, ip string) (*resty.Response, *Response, error) {
 	var result *Response
 
 	resp, err := client.Resty.R().
 		SetResult(&result).
-		Get(fmt.Sprintf(_vtIpAddressUrlPath, ip))
+		Get(fmt.Sprintf(_abuseipdbCheckUrlPath, ip))
+
 	if err != nil {
 		return nil, nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
 	}
@@ -24,15 +25,14 @@ func QueryIp(client vtsdk.Client, ip string) (*resty.Response, *Response, error)
 	// TODO: remove this
 	if resp.StatusCode() == 429 {
 		time.Sleep(time.Minute)
-		resp, err := client.Resty.R().
+		resp, err = client.Resty.R().
 			SetResult(&result).
-			Get(fmt.Sprintf(_vtIpAddressUrlPath, ip))
+			Get(fmt.Sprintf(_abuseipdbCheckUrlPath, ip))
+
 		if err != nil {
 			return nil, nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
 		}
-
-		return resp, result, err
 	}
 
-	return resp, result, err
+	return resp, result, nil
 }
