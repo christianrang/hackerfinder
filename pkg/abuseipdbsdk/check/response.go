@@ -1,5 +1,7 @@
 package check
 
+import "fmt"
+
 type Response struct {
 	Data Data `json:"data"`
 }
@@ -15,8 +17,8 @@ type Data struct {
 	UsageType            string    `json:"usageType"`
 	Isp                  string    `json:"isp"`
 	Domain               string    `json:"domain"`
-	Hostnames            []string  `json:"hostnames"`
-	ToalReports          int       `json:"toalReports"`
+	Hostnames            Hostnames `json:"hostnames"`
+	TotalReports         int       `json:"toalReports"`
 	NumDistinctUsers     int       `json:"numDistinctUsers"`
 	LastReportedAt       string    `json:"lastReportedAt"`
 	Reports              []Reports `json:"reports"`
@@ -29,4 +31,14 @@ type Reports struct {
 	ReporterId          int    `json:"reporterId"`
 	ReporterCountryCode string `json:"reporterCountryCode"`
 	ReporterCountryName string `json:"reporterCountryName"`
+}
+
+type Hostnames []string
+
+func (hostnames Hostnames) String() string {
+	var output = ""
+	for _, hostname := range hostnames {
+		output += fmt.Sprint(hostname, ", ")
+	}
+	return output
 }

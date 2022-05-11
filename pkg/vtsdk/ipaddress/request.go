@@ -11,28 +11,26 @@ import (
 
 var _vtIpAddressUrlPath = "/api/v3/ip_addresses/%s"
 
-func QueryIp(client vtsdk.Client, ip string) (*resty.Response, *Response, error) {
-	var result *Response
-
+func QueryIp(client vtsdk.Client, ip string, response *Response) (*resty.Response, error) {
 	resp, err := client.Resty.R().
-		SetResult(&result).
+		SetResult(&response).
 		Get(fmt.Sprintf(_vtIpAddressUrlPath, ip))
 	if err != nil {
-		return nil, nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
+		return nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
 	}
 
 	// TODO: remove this
 	if resp.StatusCode() == 429 {
 		time.Sleep(time.Minute)
 		resp, err := client.Resty.R().
-			SetResult(&result).
+			SetResult(&response).
 			Get(fmt.Sprintf(_vtIpAddressUrlPath, ip))
 		if err != nil {
-			return nil, nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
+			return nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
 		}
 
-		return resp, result, err
+		return resp, err
 	}
 
-	return resp, result, err
+	return resp, err
 }

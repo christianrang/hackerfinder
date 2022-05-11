@@ -11,28 +11,27 @@ import (
 
 const _abuseipdbCheckUrlPath = "/api/v2/check/?ipAddress=%s"
 
-func QueryCheck(client abuseipdbsdk.Client, ip string) (*resty.Response, *Response, error) {
-	var result *Response
+func QueryCheck(client abuseipdbsdk.Client, ip string, response *Response) (*resty.Response, error) {
 
 	resp, err := client.Resty.R().
-		SetResult(&result).
+		SetResult(&response).
 		Get(fmt.Sprintf(_abuseipdbCheckUrlPath, ip))
 
 	if err != nil {
-		return nil, nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
+		return nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
 	}
 
 	// TODO: remove this
 	if resp.StatusCode() == 429 {
 		time.Sleep(time.Minute)
 		resp, err = client.Resty.R().
-			SetResult(&result).
+			SetResult(&response).
 			Get(fmt.Sprintf(_abuseipdbCheckUrlPath, ip))
 
 		if err != nil {
-			return nil, nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
+			return nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
 		}
 	}
 
-	return resp, result, nil
+	return resp, nil
 }
