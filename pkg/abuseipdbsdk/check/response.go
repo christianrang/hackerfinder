@@ -38,7 +38,7 @@ type Hostnames []string
 func (hostnames Hostnames) String() string {
 	var output = ""
 	for _, hostname := range hostnames {
-		output += fmt.Sprint(hostname, ", ")
+		output += fmt.Sprint(hostname, " ")
 	}
 	return output
 }

@@ -1,7 +1,13 @@
 package ipaddress
 
 type Response struct {
-	Data Data `json:"data"`
+	Data  Data  `json:"data,omitempty"`
+	Error Error `json:"error,omitempty"`
+}
+
+type Error struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
 
 type Data struct {

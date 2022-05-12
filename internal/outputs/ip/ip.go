@@ -1,4 +1,4 @@
-package outputs
+package ip
 
 import (
 	"fmt"

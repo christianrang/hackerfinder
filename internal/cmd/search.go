@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/christianrang/find-bad-ip/internal/outputs"
+	outputs "github.com/christianrang/find-bad-ip/internal/outputs/ip"
 	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
 	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk/check"
 	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
@@ -50,7 +50,7 @@ var (
 
 				csvWriter = csv.NewWriter(csvFile)
 				defer csvWriter.Flush()
-				output.WriteRow(csvWriter, output.CreateHeaders())
+				output.WriteRow(csvWriter, outputs.CreateHeaders())
 				csvWriter.Flush()
 			}
 
@@ -98,7 +98,7 @@ func handleIp(vtClient *vtsdk.Client, abuseIpClient *abuseipdbsdk.Client, t tabl
 		}
 
 		if csvW != nil {
-			output.WriteRow(csvW, output.CreateRecord(&ipOutput.VtIpAddress))
+			outputs.WriteRow(csvW, ipOutput.CreateRecord())
 		}
 
 		ipOutput.CreateTableRow(t)
@@ -124,7 +124,7 @@ func handleIpFile(client *vtsdk.Client, t table.Writer, csvW *csv.Writer) {
 			}
 
 			if csvW != nil {
-				output.WriteRow(csvW, output.CreateRecord(&ipOutput.VtIpAddress))
+				outputs.WriteRow(csvW, ipOutput.CreateRecord())
 			}
 
 			ipOutput.CreateTableRow(t)
