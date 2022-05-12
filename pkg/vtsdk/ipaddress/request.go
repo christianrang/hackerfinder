@@ -3,7 +3,6 @@ package ipaddress
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
 	resty "github.com/go-resty/resty/v2"
@@ -17,19 +16,6 @@ func QueryIp(client vtsdk.Client, ip string, response *Response) (*resty.Respons
 		Get(fmt.Sprintf(_vtIpAddressUrlPath, ip))
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
-	}
-
-	// TODO: remove this
-	if resp.StatusCode() == 429 {
-		time.Sleep(time.Minute)
-		resp, err := client.Resty.R().
-			SetResult(&response).
-			Get(fmt.Sprintf(_vtIpAddressUrlPath, ip))
-		if err != nil {
-			return nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
-		}
-
-		return resp, err
 	}
 
 	return resp, err

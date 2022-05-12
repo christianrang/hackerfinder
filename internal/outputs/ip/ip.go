@@ -23,7 +23,7 @@ var _tableHeaders = table.Row{
 
 type Ip struct {
 	AbuseipdbCheck check.Response     `json:"abuseipdb_check"`
-	VtIpAddress    ipaddress.Response `json:"vt_ip_address"`
+	VirusTotalIp   ipaddress.Response `json:"vt_ip_address"`
 }
 
 func InitializeTable() table.Writer {
@@ -36,11 +36,11 @@ func InitializeTable() table.Writer {
 
 func (ip Ip) CreateTableRow(t table.Writer) {
 	t.AppendRow([]interface{}{
-		ip.VtIpAddress.Data.Id, // IP
-		ip.VtIpAddress.Data.Attributes.LastAnalysisStats.Malicious,   // VT M
-		ip.VtIpAddress.Data.Attributes.LastAnalysisStats.Suspicious,  // VT S
-		ip.VtIpAddress.Data.Attributes.LastAnalysisStats.Harmless,    // VT H
-		ip.VtIpAddress.Data.Attributes.LastAnalysisStats.Undetected,  // VT U
+		ip.VirusTotalIp.Data.Id, // IP
+		ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Malicious,  // VT M
+		ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Suspicious, // VT S
+		ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Harmless,   // VT H
+		ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Undetected, // VT U
 		fmt.Sprint(ip.AbuseipdbCheck.Data.AbuseConfidenceScore, "%"), // AbuseIp Conf Score
 		ip.AbuseipdbCheck.Data.TotalReports,                          // AbuseIp Report Count
 		ip.AbuseipdbCheck.Data.NumDistinctUsers,                      // AbuseIp Users

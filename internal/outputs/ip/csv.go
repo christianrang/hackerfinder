@@ -27,14 +27,14 @@ func CreateHeaders() []string {
 func (ip Ip) CreateRecord() []string {
 	// Number of Columns: 12
 	return []string{
-		ip.VtIpAddress.Data.Id,
-		strconv.Itoa(ip.VtIpAddress.Data.Attributes.LastAnalysisStats.Malicious),
-		strconv.Itoa(ip.VtIpAddress.Data.Attributes.LastAnalysisStats.Suspicious),
-		strconv.Itoa(ip.VtIpAddress.Data.Attributes.LastAnalysisStats.Harmless),
-		strconv.Itoa(ip.VtIpAddress.Data.Attributes.LastAnalysisStats.Undetected),
-		strconv.Itoa(ip.VtIpAddress.Data.Attributes.Reputation),
-		ip.VtIpAddress.Data.Attributes.Country,
-		ip.VtIpAddress.Data.Attributes.Continent,
+		ip.VirusTotalIp.Data.Id,
+		strconv.Itoa(ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Malicious),
+		strconv.Itoa(ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Suspicious),
+		strconv.Itoa(ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Harmless),
+		strconv.Itoa(ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Undetected),
+		strconv.Itoa(ip.VirusTotalIp.Data.Attributes.Reputation),
+		ip.VirusTotalIp.Data.Attributes.Country,
+		ip.VirusTotalIp.Data.Attributes.Continent,
 		fmt.Sprint(ip.AbuseipdbCheck.Data.AbuseConfidenceScore, "%"),
 		strconv.Itoa(ip.AbuseipdbCheck.Data.TotalReports),
 		strconv.Itoa(ip.AbuseipdbCheck.Data.NumDistinctUsers),

@@ -3,30 +3,23 @@ package cmd
 import (
 	"log"
 
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
+	"github.com/christianrang/find-bad-ip/internal"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
 	configurationFile string
-	configuration     Configuration
+	configuration     internal.Configuration
 	rootCmd           = &cobra.Command{
 		Use:     "badip",
 		Short:   "a script for quickly querying the VirusTotal API",
-		Version: "v1.2.0",
+		Version: "v1.2.1",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 		},
 	}
 )
-
-// TODO: move this somewhere better
-type Configuration struct {
-	VTConfig  vtsdk.Configuration        `mapstructure:"virustotal"`
-	Abuseipdb abuseipdbsdk.Configuration `mapstructure:"abuseaipdb"`
-}
 
 func Execute() {
 	rootCmd.Execute()

@@ -8,19 +8,17 @@ import (
 	"os"
 	"strings"
 
+	"github.com/christianrang/find-bad-ip/internal"
 	outputs "github.com/christianrang/find-bad-ip/internal/outputs/ip"
 	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk/check"
 	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk/ipaddress"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
 
 var (
-	ipOutput outputs.Ip
-	ipFile   []string
-	ips      []string
+	ipFile []string
+	ips    []string
 	// Used to output data
 	csvFilename string
 	csvFile     *os.File
@@ -30,8 +28,10 @@ var (
 		Short: "searches virustotal and abuseaipdb",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("Searching...")
-			vtClient := vtsdk.CreateClient(configuration.VTConfig)
-			abuseIpClient := abuseipdbsdk.CreateClient(configuration.Abuseipdb)
+			client := internal.Client{
+				VirusTotalClient: vtsdk.CreateClient(configuration.Api.VTConfig),
+				AbuseipdbClient:  abuseipdbsdk.CreateClient(configuration.Api.Abuseipdb),
+			}
 
 			t := outputs.InitializeTable()
 
@@ -50,11 +50,10 @@ var (
 				csvWriter = csv.NewWriter(csvFile)
 				defer csvWriter.Flush()
 				outputs.WriteRow(csvWriter, outputs.CreateHeaders())
-				csvWriter.Flush()
 			}
 
-			handleIp(vtClient, abuseIpClient, t, csvWriter)
-			handleIpFile(vtClient, abuseIpClient, t, csvWriter)
+			handleIp(client, t, csvWriter)
+			handleIpFile(client, t, csvWriter)
 
 			t.Render()
 		},
@@ -86,25 +85,24 @@ func init() {
 	)
 }
 
-func handleIp(vtClient *vtsdk.Client, abuseIpClient *abuseipdbsdk.Client, t table.Writer, csvW *csv.Writer) {
+func handleIp(client internal.Client, t table.Writer, csvW *csv.Writer) {
 	for _, ip := range ips {
-		_, err := ipaddress.QueryIp(*vtClient, ip, &ipOutput.VtIpAddress)
 
-		_, err = check.QueryCheck(*abuseIpClient, ip, &ipOutput.AbuseipdbCheck)
+		resp, err := client.QueryIp(ip)
 
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		if csvW != nil {
-			outputs.WriteRow(csvW, ipOutput.CreateRecord())
+			outputs.WriteRow(csvW, resp.CreateRecord())
 		}
 
-		ipOutput.CreateTableRow(t)
+		resp.CreateTableRow(t)
 	}
 }
 
-func handleIpFile(vtClient *vtsdk.Client, abuseIpClient *abuseipdbsdk.Client, t table.Writer, csvW *csv.Writer) {
+func handleIpFile(client internal.Client, t table.Writer, csvW *csv.Writer) {
 	for _, file := range ipFile {
 		data, err := os.ReadFile(file)
 		if err != nil {
@@ -117,21 +115,16 @@ func handleIpFile(vtClient *vtsdk.Client, abuseIpClient *abuseipdbsdk.Client, t 
 			if ip == "" {
 				break
 			}
-			_, err := ipaddress.QueryIp(*vtClient, ip, &ipOutput.VtIpAddress)
+			resp, err := client.QueryIp(ip)
 			if err != nil {
-				log.Fatalf("%#v", err)
-			}
-
-			_, err = check.QueryCheck(*abuseIpClient, ip, &ipOutput.AbuseipdbCheck)
-			if err != nil {
-				fmt.Println(err)
+				fmt.Printf("error: failed to query ip: %s", err)
 			}
 
 			if csvW != nil {
-				outputs.WriteRow(csvW, ipOutput.CreateRecord())
+				outputs.WriteRow(csvW, resp.CreateRecord())
 			}
 
-			ipOutput.CreateTableRow(t)
+			resp.CreateTableRow(t)
 		}
 	}
 }
