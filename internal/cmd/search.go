@@ -13,7 +13,6 @@ import (
 	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk/check"
 	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
 	"github.com/christianrang/find-bad-ip/pkg/vtsdk/ipaddress"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk/ipaddress/output"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
@@ -50,12 +49,12 @@ var (
 
 				csvWriter = csv.NewWriter(csvFile)
 				defer csvWriter.Flush()
-				output.WriteRow(csvWriter, outputs.CreateHeaders())
+				outputs.WriteRow(csvWriter, outputs.CreateHeaders())
 				csvWriter.Flush()
 			}
 
 			handleIp(vtClient, abuseIpClient, t, csvWriter)
-			handleIpFile(vtClient, t, csvWriter)
+			handleIpFile(vtClient, abuseIpClient, t, csvWriter)
 
 			t.Render()
 		},
@@ -105,7 +104,7 @@ func handleIp(vtClient *vtsdk.Client, abuseIpClient *abuseipdbsdk.Client, t tabl
 	}
 }
 
-func handleIpFile(client *vtsdk.Client, t table.Writer, csvW *csv.Writer) {
+func handleIpFile(vtClient *vtsdk.Client, abuseIpClient *abuseipdbsdk.Client, t table.Writer, csvW *csv.Writer) {
 	for _, file := range ipFile {
 		data, err := os.ReadFile(file)
 		if err != nil {
@@ -118,9 +117,14 @@ func handleIpFile(client *vtsdk.Client, t table.Writer, csvW *csv.Writer) {
 			if ip == "" {
 				break
 			}
-			_, err := ipaddress.QueryIp(*client, ip, &ipOutput.VtIpAddress)
+			_, err := ipaddress.QueryIp(*vtClient, ip, &ipOutput.VtIpAddress)
 			if err != nil {
 				log.Fatalf("%#v", err)
+			}
+
+			_, err = check.QueryCheck(*abuseIpClient, ip, &ipOutput.AbuseipdbCheck)
+			if err != nil {
+				fmt.Println(err)
 			}
 
 			if csvW != nil {
