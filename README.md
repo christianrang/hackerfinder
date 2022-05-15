@@ -4,6 +4,12 @@
 
 Uses VirusTotal to look up malicious things
 
+## Getting Started
+
+- Navigate to [releases](https://github.com/christianrang/hackerfinder/releases)
+
+- Select the `Assets` drop down for version you would like and the correct OS / Arch for your computer
+
 ## Outputs
 
 ### IP Tables
