@@ -1,6 +1,6 @@
 # hackerfinder
 
-*WARNING*: If you are looking to use the pkg files to access the APIs. This repo is by no means stable and everything is subject to change.
+> *WARNING*: If you are looking to use the pkg files to access the APIs. This repo is not stable and everything is subject to change.
 
 Uses VirusTotal to look up malicious things
 
@@ -38,3 +38,13 @@ virustotal:
 abuseaipdb:
   api_key: { your abuseaipdb api key}
 ```
+
+## TODOs
+
+- Self-updating (maybe use [this?](https://github.com/minio/selfupdate))
+
+- Create a subcommand for install
+
+  - Should include configuration setup
+
+  - Adding binary to path
