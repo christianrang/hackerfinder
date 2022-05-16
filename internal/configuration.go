@@ -14,3 +14,7 @@ type Api struct {
 	VTConfig  vtsdk.Configuration        `mapstructure:"virustotal"`
 	Abuseipdb abuseipdbsdk.Configuration `mapstructure:"abuseaipdb"`
 }
+
+func (api *Api) HasApiKey() bool {
+	return api.VTConfig.ApiKey != "" || api.Abuseipdb.ApiKey != ""
+}

@@ -27,11 +27,17 @@ var (
 		Use:   "search [OPTIONS]",
 		Short: "searches virustotal and abuseaipdb",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Searching...")
 			client := internal.Client{
 				VirusTotalClient: vtsdk.CreateClient(configuration.Api.VTConfig),
 				AbuseipdbClient:  abuseipdbsdk.CreateClient(configuration.Api.Abuseipdb),
 			}
+
+			if !configuration.Api.HasApiKey() {
+				fmt.Printf("error: please configure an API key\n")
+				os.Exit(2)
+			}
+
+			fmt.Println("Searching...")
 
 			t := outputs.InitializeTable()
 

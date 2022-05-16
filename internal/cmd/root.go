@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/christianrang/find-bad-ip/internal"
 	"github.com/spf13/cobra"
@@ -13,7 +15,7 @@ var (
 	configuration     internal.Configuration
 	rootCmd           = &cobra.Command{
 		Use:     "badip",
-		Short:   "a script for quickly querying the VirusTotal API",
+		Short:   "a script for quickly querying VirusTotal and Abuseipdb APIs",
 		Version: "v1.2.1",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
@@ -44,6 +46,7 @@ func initConfig() {
 
 	err := viper.Unmarshal(&configuration)
 	if err != nil {
-		log.Fatalf("unable to decode into struct: %v\n", err)
+		fmt.Printf("unable to decode into struct: %v\n", err)
+		os.Exit(1)
 	}
 }
