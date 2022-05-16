@@ -32,19 +32,21 @@ func TestQueryIp(t *testing.T) {
 		expected int
 		client   *vtsdk.Client
 		param    string
+		response *ipaddress.Response
 	}{
 		{
 			200,
 			vtsdk.CreateClient(configuration),
 			"8.8.8.8",
+			&ipaddress.Response{},
 		},
 	}
 	for _, test := range tests {
-		resp, res, err := ipaddress.QueryIp(*test.client, test.param)
+		resp, err := ipaddress.QueryIp(*test.client, test.param, test.response)
 		if err != nil {
 			t.Fatal(err)
 		}
-		t.Logf("%#v", res)
+		t.Logf("%#v", test.response)
 		assert.Equal(t, test.expected, resp.StatusCode(), "they should be equal")
 	}
 }
