@@ -1,3 +1,4 @@
+PHONY:build
 build:
 	mkdir -p bin
 	GOOS=linux GOARCH=386 go build -o bin/hackerfinder_linux_386 -v cmd/cli/main.go
