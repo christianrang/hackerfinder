@@ -18,6 +18,8 @@ import (
 
 var (
 	ipFile []string
+	domainFile []string
+	domainFile []string
 	ips    []string
 	// Used to output data
 	csvFilename string
@@ -76,6 +78,14 @@ func init() {
 		"sets a file of IPs to search. Each IP must be on its own line.",
 	)
 	searchCmd.Flags().StringSliceVar(
+		&domain,
+		"domain",
+		domainFile,
+		// TODO: add a useage
+		"sets a file of Domains to search. Each Domain must be on its own line.",
+	)
+	
+	searchCmd.Flags().StringSliceVar(
 		&ips,
 		"ip",
 		ips,
@@ -108,6 +118,23 @@ func handleIp(client internal.Client, t table.Writer, csvW *csv.Writer) {
 	}
 }
 
+func handleDomain(client internal.Client, t table.Writer, csvW *csv.Writer) {
+	for _, domain := range domains {
+
+		resp, err := client. QueryDomain(domain)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		if csvW != nil {
+			outputs.WriteRow(csvW, resp.CreateRecord())
+		}
+
+		resp.CreateTableRow(t)
+	}
+}
+
 func handleIpFile(client internal.Client, t table.Writer, csvW *csv.Writer) {
 	for _, file := range ipFile {
 		data, err := os.ReadFile(file)
@@ -124,6 +151,29 @@ func handleIpFile(client internal.Client, t table.Writer, csvW *csv.Writer) {
 			resp, err := client.QueryIp(ip)
 			if err != nil {
 				fmt.Printf("error: failed to query ip: %s", err)
+			}
+
+			if csvW != nil {
+				outputs.WriteRow(csvW, resp.CreateRecord())
+			}
+
+			resp.CreateTableRow(t)
+		}
+	}
+}
+
+func handleIpFile(client internal.Client, t table.Writer, csvW *csv.Writer) {
+	for_, file := range domainFile {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("%#v", err)
+		}
+
+		contents := strings.Split(string(data), "\n")
+
+		for _, ip := range contents {
+			if ip == "" {
+				break
 			}
 
 			if csvW != nil {
