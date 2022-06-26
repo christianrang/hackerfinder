@@ -3,11 +3,13 @@ package internal
 import (
 	"fmt"
 
-	"github.com/christianrang/find-bad-ip/internal/outputs/ip"
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk/check"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk/ipaddress"
+	outputsDomain "github.com/christianrang/hackerfinder/internal/outputs/domain"
+	"github.com/christianrang/hackerfinder/internal/outputs/ip"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk/check"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk/domain"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk/ipaddress"
 )
 
 type Client struct {
@@ -42,4 +44,23 @@ func (client *Client) QueryIp(_ip string) (*ip.Ip, error) {
 	}
 
 	return &response, nil
+}
+
+func (client *Client) QueryDomain(_domain string) (outputsDomain.Domain, error) {
+	var (
+		response outputsDomain.Domain
+		ok       bool
+	)
+
+	_, ok = client.VirusTotalClient.Resty.Header["X-Apikey"]
+	if ok {
+		_, err := domain.Query(*client.VirusTotalClient, _domain, &response.VirusTotalDomain)
+		if err != nil {
+			return outputsDomain.Domain{}, err
+		}
+	} else {
+		fmt.Println("warning: No API key was set for VirusTotal. The output may be incomplete.")
+	}
+
+	return response, nil
 }

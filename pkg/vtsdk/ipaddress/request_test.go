@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk/ipaddress"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk/ipaddress"
 	"github.com/stretchr/testify/assert"
 )
 

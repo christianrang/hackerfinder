@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk"
 )
 
 // TODO: move this somewhere better

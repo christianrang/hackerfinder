@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/christianrang/find-bad-ip/internal"
+	"github.com/christianrang/hackerfinder/internal"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

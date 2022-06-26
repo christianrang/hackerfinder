@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk/check"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk/check"
 	"github.com/stretchr/testify/assert"
 )
 

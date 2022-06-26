@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk/check"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk/ipaddress"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk/check"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk/ipaddress"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 

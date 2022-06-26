@@ -1,6 +1,6 @@
 package main
 
-import "github.com/christianrang/find-bad-ip/internal/cmd"
+import "github.com/christianrang/hackerfinder/internal/cmd"
 
 func main() {
 	cmd.Execute()

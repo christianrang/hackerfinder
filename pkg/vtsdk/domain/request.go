@@ -1,22 +1,39 @@
-package ipaddress
+package domain
 
 import (
-	        "errors"
-		        "fmt"
+	"errors"
+	"fmt"
+	"time"
 
-			        "github.com/christianrang/find-bad-ip/pkg/vtsdk"
-				        resty "github.com/go-resty/resty/v2"
-				)
+	"github.com/christianrang/hackerfinder/pkg/vtsdk"
+	resty "github.com/go-resty/resty/v2"
+)
 
-				var _vtIpAddressUrlPath = "/api/v3/ip_addresses/%s"
+var DomainReportUrlPath = "/api/v3/domains/%s"
 
-				func QueryIp(client vtsdk.Client, ip string, response *Response) (*resty.Response, error) {
-					        resp, err := client.Resty.R().
-						                SetResult(&response).
-								                Get(fmt.Sprintf(_vtIpAddressUrlPath, ip))
-										        if err != nil {
-												                return nil, errors.New(fmt.Sprintf("error in sending request %s\n", err))
-														        }
+func Query(client vtsdk.Client, domain string, response *Response) (*resty.Response, error) {
+	var (
+		resp *resty.Response
+		err  error
+	)
 
-															        return resp, err
-															}
+queryLoop:
+	for {
+		resp, err = client.Resty.R().
+			SetResult(&response).
+			Get(fmt.Sprintf(DomainReportUrlPath, domain))
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("error in sending request %s: ", err))
+		}
+
+		switch resp.StatusCode() {
+		case 200:
+			break queryLoop
+		case 429:
+			time.Sleep(time.Minute)
+		default:
+			break queryLoop
+		}
+	}
+	return resp, err
+}

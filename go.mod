@@ -1,4 +1,4 @@
-module github.com/christianrang/find-bad-ip
+module github.com/christianrang/hackerfinder
 
 go 1.18
 

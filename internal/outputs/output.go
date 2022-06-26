@@ -1,8 +1,8 @@
 package output
 
 import (
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk/check"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk/ipaddress"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk/check"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk/ipaddress"
 )
 
 type Ip struct {
