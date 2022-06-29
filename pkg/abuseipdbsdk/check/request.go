@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk"
 	resty "github.com/go-resty/resty/v2"
 )
 

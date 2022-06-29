@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk"
 	resty "github.com/go-resty/resty/v2"
 )
 

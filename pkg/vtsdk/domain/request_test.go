@@ -1,4 +1,4 @@
-package ipaddress_test
+package domain_test
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/christianrang/hackerfinder/pkg/vtsdk"
-	"github.com/christianrang/hackerfinder/pkg/vtsdk/ipaddress"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk/domain"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,28 +25,27 @@ func getApiKey() string {
 	return apiKey
 }
 
-func TestQueryIp(t *testing.T) {
+func TestQuery(t *testing.T) {
 	createConfiguration()
 
 	tests := []struct {
 		expected int
 		client   *vtsdk.Client
 		param    string
-		response *ipaddress.Response
+		response *domain.Response
 	}{
 		{
 			200,
 			vtsdk.CreateClient(configuration),
-			"8.8.8.8",
-			&ipaddress.Response{},
+			"google.com",
+			&domain.Response{},
 		},
 	}
 	for _, test := range tests {
-		resp, err := ipaddress.QueryIp(*test.client, test.param, test.response)
+		resp, err := domain.Query(*test.client, test.param, test.response)
 		if err != nil {
 			t.Fatal(err)
 		}
-		t.Logf("%#v", test.response)
-		assert.Equal(t, test.expected, resp.StatusCode(), "they should be equal")
+		assert.Equal(t, test.expected, resp.StatusCode(), "should get 200")
 	}
 }

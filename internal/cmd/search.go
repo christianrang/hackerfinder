@@ -8,17 +8,20 @@ import (
 	"os"
 	"strings"
 
-	"github.com/christianrang/find-bad-ip/internal"
-	outputs "github.com/christianrang/find-bad-ip/internal/outputs/ip"
-	"github.com/christianrang/find-bad-ip/pkg/abuseipdbsdk"
-	"github.com/christianrang/find-bad-ip/pkg/vtsdk"
+	"github.com/christianrang/hackerfinder/internal"
+	outputDomain "github.com/christianrang/hackerfinder/internal/outputs/domain"
+	outputIp "github.com/christianrang/hackerfinder/internal/outputs/ip"
+	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
 
 var (
-	ipFile []string
-	ips    []string
+	ipFile     []string
+	domainFile []string
+	domains    []string
+	ips        []string
 	// Used to output data
 	csvFilename string
 	csvFile     *os.File
@@ -27,6 +30,8 @@ var (
 		Use:   "search [OPTIONS]",
 		Short: "searches virustotal and abuseaipdb",
 		Run: func(cmd *cobra.Command, args []string) {
+			var t table.Writer
+
 			client := internal.Client{
 				VirusTotalClient: vtsdk.CreateClient(configuration.Api.VTConfig),
 				AbuseipdbClient:  abuseipdbsdk.CreateClient(configuration.Api.Abuseipdb),
@@ -39,7 +44,14 @@ var (
 
 			fmt.Println("Searching...")
 
-			t := outputs.InitializeTable()
+			switch {
+			case len(domains) > 0:
+				t = outputDomain.InitializeTable()
+			case len(ips) > 0:
+				t = outputIp.InitializeTable()
+			default:
+				t = outputIp.InitializeTable()
+			}
 
 			if csvFilename != "" {
 				if _, err := os.Stat(csvFilename); !errors.Is(err, os.ErrNotExist) {
@@ -55,11 +67,14 @@ var (
 
 				csvWriter = csv.NewWriter(csvFile)
 				defer csvWriter.Flush()
-				outputs.WriteRow(csvWriter, outputs.CreateHeaders())
+				outputIp.WriteRow(csvWriter, outputIp.CreateHeaders())
 			}
 
 			handleIp(client, t, csvWriter)
 			handleIpFile(client, t, csvWriter)
+
+			handleDomain(client, t, csvWriter)
+			handleDomainFile(client, t, csvWriter)
 
 			t.Render()
 		},
@@ -75,6 +90,14 @@ func init() {
 		// TODO: add a useage
 		"sets a file of IPs to search. Each IP must be on its own line.",
 	)
+	searchCmd.Flags().StringSliceVar(
+		&domains,
+		"domain",
+		domainFile,
+		// TODO: add a useage
+		"sets a file of Domains to search. Each Domain must be on its own line.",
+	)
+
 	searchCmd.Flags().StringSliceVar(
 		&ips,
 		"ip",
@@ -101,7 +124,24 @@ func handleIp(client internal.Client, t table.Writer, csvW *csv.Writer) {
 		}
 
 		if csvW != nil {
-			outputs.WriteRow(csvW, resp.CreateRecord())
+			outputIp.WriteRow(csvW, resp.CreateRecord())
+		}
+
+		resp.CreateTableRow(t)
+	}
+}
+
+func handleDomain(client internal.Client, t table.Writer, csvW *csv.Writer) {
+	for _, domain := range domains {
+
+		resp, err := client.QueryDomain(domain)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		if csvW != nil {
+			outputIp.WriteRow(csvW, resp.CreateRecord())
 		}
 
 		resp.CreateTableRow(t)
@@ -127,7 +167,34 @@ func handleIpFile(client internal.Client, t table.Writer, csvW *csv.Writer) {
 			}
 
 			if csvW != nil {
-				outputs.WriteRow(csvW, resp.CreateRecord())
+				outputIp.WriteRow(csvW, resp.CreateRecord())
+			}
+
+			resp.CreateTableRow(t)
+		}
+	}
+}
+
+func handleDomainFile(client internal.Client, t table.Writer, csvW *csv.Writer) {
+	for _, file := range domainFile {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("%#v", err)
+		}
+
+		contents := strings.Split(string(data), "\n")
+
+		for _, domain := range contents {
+			if domain == "" {
+				break
+			}
+			resp, err := client.QueryDomain(domain)
+			if err != nil {
+				fmt.Printf("error: failed to query domain: %s", err)
+			}
+
+			if csvW != nil {
+				outputIp.WriteRow(csvW, resp.CreateRecord())
 			}
 
 			resp.CreateTableRow(t)
