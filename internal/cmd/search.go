@@ -10,6 +10,7 @@ import (
 
 	"github.com/christianrang/hackerfinder/internal"
 	outputDomain "github.com/christianrang/hackerfinder/internal/outputs/domain"
+	outputHashes "github.com/christianrang/hackerfinder/internal/outputs/hashes"
 	outputIp "github.com/christianrang/hackerfinder/internal/outputs/ip"
 	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk"
 	"github.com/christianrang/hackerfinder/pkg/vtsdk"
@@ -20,8 +21,12 @@ import (
 var (
 	ipFile     []string
 	domainFile []string
-	domains    []string
-	ips        []string
+	hashesFile []string
+
+	domains []string
+	ips     []string
+	hashes  []string
+
 	// Used to output data
 	csvFilename string
 	csvFile     *os.File
@@ -49,13 +54,15 @@ var (
 				t = outputDomain.InitializeTable()
 			case len(ips) > 0:
 				t = outputIp.InitializeTable()
+			case len(hashes) > 0:
+				t = outputHashes.InitializeTable()
 			default:
 				t = outputIp.InitializeTable()
 			}
 
 			if csvFilename != "" {
 				if _, err := os.Stat(csvFilename); !errors.Is(err, os.ErrNotExist) {
-					fmt.Printf("error: file %s already exists\n", csvFilename)
+					fmt.Printf("error: file %s already exists. Please use a different filename.\n", csvFilename)
 					os.Exit(1)
 				}
 				csvFile, err := os.Create(csvFilename)
@@ -67,7 +74,16 @@ var (
 
 				csvWriter = csv.NewWriter(csvFile)
 				defer csvWriter.Flush()
-				outputIp.WriteRow(csvWriter, outputIp.CreateHeaders())
+				switch {
+				case len(domains) > 0:
+					outputDomain.WriteRow(csvWriter, outputDomain.CreateHeaders())
+				case len(ips) > 0:
+					outputIp.WriteRow(csvWriter, outputIp.CreateHeaders())
+				case len(hashes) > 0:
+					outputHashes.WriteRow(csvWriter, outputHashes.CreateHeaders())
+				default:
+					outputIp.WriteRow(csvWriter, outputIp.CreateHeaders())
+				}
 			}
 
 			handleIp(client, t, csvWriter)
@@ -75,6 +91,9 @@ var (
 
 			handleDomain(client, t, csvWriter)
 			handleDomainFile(client, t, csvWriter)
+
+			handleHashes(client, t, csvWriter)
+			handleHashesFile(client, t, csvWriter)
 
 			t.Render()
 		},
@@ -105,6 +124,23 @@ func init() {
 		// TODO: add a useage
 		"",
 	)
+
+	searchCmd.Flags().StringSliceVar(
+		&hashes,
+		"hashes",
+		hashes,
+		// TODO: add a useage
+		"",
+	)
+
+	searchCmd.Flags().StringSliceVar(
+		&hashesFile,
+		"hashes-file",
+		hashesFile,
+		// TODO: add a useage
+		"sets a file of hashes to search. Each hash must be on its own line.",
+	)
+
 	searchCmd.Flags().StringVar(
 		&csvFilename,
 		"csv",
@@ -135,6 +171,23 @@ func handleDomain(client internal.Client, t table.Writer, csvW *csv.Writer) {
 	for _, domain := range domains {
 
 		resp, err := client.QueryDomain(domain)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		if csvW != nil {
+			outputIp.WriteRow(csvW, resp.CreateRecord())
+		}
+
+		resp.CreateTableRow(t)
+	}
+}
+
+func handleHashes(client internal.Client, t table.Writer, csvW *csv.Writer) {
+	for _, hash := range hashes {
+
+		resp, err := client.QueryHashes(hash)
 
 		if err != nil {
 			log.Fatalln(err)
@@ -191,6 +244,33 @@ func handleDomainFile(client internal.Client, t table.Writer, csvW *csv.Writer) 
 			resp, err := client.QueryDomain(domain)
 			if err != nil {
 				fmt.Printf("error: failed to query domain: %s", err)
+			}
+
+			if csvW != nil {
+				outputIp.WriteRow(csvW, resp.CreateRecord())
+			}
+
+			resp.CreateTableRow(t)
+		}
+	}
+}
+
+func handleHashesFile(client internal.Client, t table.Writer, csvW *csv.Writer) {
+	for _, file := range hashesFile {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("%#v", err)
+		}
+
+		contents := strings.Split(string(data), "\n")
+
+		for _, hash := range contents {
+			if hash == "" {
+				break
+			}
+			resp, err := client.QueryHashes(hash)
+			if err != nil {
+				fmt.Printf("error: failed to query ip: %s", err)
 			}
 
 			if csvW != nil {
