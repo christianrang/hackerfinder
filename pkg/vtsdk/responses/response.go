@@ -8,12 +8,23 @@ type Error struct {
 	Message string `json:"message"`
 }
 
+type Links struct {
+	Self string `json:"self"`
+}
+
 type LastAnalysisStats struct {
-	Harmless   int `json:"harmless"`
-	Malicious  int `json:"malicious"`
-	Suspicious int `json:"suspicious"`
-	Undetected int `json:"undetected"`
-	Timeout    int `json:"timeout"`
+	Harmless         int `json:"harmless"`
+	Malicious        int `json:"malicious"`
+	Suspicious       int `json:"suspicious"`
+	Undetected       int `json:"undetected"`
+	Timeout          int `json:"timeout"`
+	TypeUnsupported  int `json:"type-unsupported"`
+	ConfirmedTimeout int `json:"confirmed-timeout"`
+	Failure          int `json:"failure"`
+}
+
+type TotalVotes struct {
+	LastAnalysisResults
 }
 
 type LastAnalysisResults struct {
