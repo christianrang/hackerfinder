@@ -3,6 +3,8 @@ package hashes
 import (
 	"os"
 
+	outputTypes "github.com/christianrang/hackerfinder/internal/outputs/types"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk/hashes"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
@@ -13,6 +15,12 @@ var _tableHeaders = table.Row{
 	"VT H",
 	"VT U",
 }
+
+type Hashes struct {
+	VirusTotalHashes hashes.Response
+}
+
+var _ outputTypes.Output = (*Hashes)(nil)
 
 func InitializeTable() table.Writer {
 	t := table.NewWriter()

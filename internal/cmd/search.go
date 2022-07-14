@@ -31,7 +31,8 @@ var (
 	csvFilename string
 	csvFile     *os.File
 	csvWriter   *csv.Writer
-	searchCmd   = &cobra.Command{
+
+	searchCmd = &cobra.Command{
 		Use:   "search [OPTIONS]",
 		Short: "searches virustotal and abuseaipdb",
 		Run: func(cmd *cobra.Command, args []string) {
