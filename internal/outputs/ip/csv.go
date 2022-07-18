@@ -43,6 +43,10 @@ func (ip Ip) CreateRecord() []string {
 }
 
 func (_ip Ip) WriteRow(w *csv.Writer, createRecord func() []string) error {
+	return WriteRow(w, createRecord)
+}
+
+func WriteRow(w *csv.Writer, createRecord func() []string) error {
 	defer w.Flush()
 
 	if err := w.Write(createRecord()); err != nil {

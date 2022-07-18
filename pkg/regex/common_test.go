@@ -81,7 +81,7 @@ func TestCommonRegex(t *testing.T) {
 			regex:    Sha256,
 		},
 		{
-			name:     "sha256: bad (shorter that 32 chars) sha256 should not return sha256",
+			name:     "sha256: bad (shorter that 65 chars) sha256 should not return sha256",
 			expected: []byte(nil),
 			value:    []byte("adsf"),
 			regex:    Sha256,
@@ -91,6 +91,24 @@ func TestCommonRegex(t *testing.T) {
 			expected: []byte(nil),
 			value:    []byte("5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03adf"),
 			regex:    Sha256,
+		},
+		{
+			name:     "VirusTotalHash sha256: good sha256 should return sha256",
+			expected: []byte("5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03"),
+			value:    []byte("5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03"),
+			regex:    VirusTotalHashes,
+		},
+		{
+			name:     "VirusTotalHashes sha256: bad (longer that 65 chars) sha256 should not return sha256",
+			expected: []byte(nil),
+			value:    []byte("5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03adf"),
+			regex:    VirusTotalHashes,
+		},
+		{
+			name:     "VirusTotalHashes sha256: bad (shorter that 65 chars) sha256 should not return sha256",
+			expected: []byte(nil),
+			value:    []byte("adsf"),
+			regex:    VirusTotalHashes,
 		},
 	}
 
