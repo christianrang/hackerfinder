@@ -16,7 +16,7 @@ var (
 	rootCmd           = &cobra.Command{
 		Use:     "badip",
 		Short:   "a script for quickly querying VirusTotal and Abuseipdb APIs",
-		Version: "v1.2.1",
+		Version: "v1.4.1",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 		},
