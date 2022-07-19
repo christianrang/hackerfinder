@@ -57,8 +57,6 @@ var (
 				t = outputIp.InitializeTable()
 			case len(hashes) > 0:
 				t = outputHashes.InitializeTable()
-			default:
-				t = outputIp.InitializeTable()
 			}
 
 			if csvFilename != "" {
@@ -82,8 +80,6 @@ var (
 					outputIp.WriteRow(csvWriter, outputIp.CreateHeaders)
 				case len(hashes) > 0:
 					outputHashes.WriteRow(csvWriter, outputHashes.CreateHeaders)
-				default:
-					outputIp.WriteRow(csvWriter, outputIp.CreateHeaders)
 				}
 			}
 

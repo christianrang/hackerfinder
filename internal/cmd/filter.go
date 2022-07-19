@@ -73,24 +73,28 @@ var (
 					regex     string
 					table     table.Writer
 					csvWriter *csv.Writer
+					validator func(string) bool
 				}{
 					{
 						query:     client.QueryDomain,
 						regex:     commonregex.Domain,
 						table:     domainTable,
 						csvWriter: domainCsvWriter,
+						validator: ValidateDomain,
 					},
 					{
 						query:     client.QueryIp,
 						regex:     commonregex.Ip,
 						table:     ipTable,
 						csvWriter: ipCsvWriter,
+						validator: ValidateIp,
 					},
 					{
 						query:     client.QueryHashes,
 						regex:     commonregex.VirusTotalHashes,
 						table:     hashesTable,
 						csvWriter: hashesCsvWriter,
+						validator: ValidateHash,
 					},
 				}
 
@@ -98,7 +102,10 @@ var (
 					compiledRegex, _ := regexp.Compile(item.regex)
 					foundItems := compiledRegex.FindAll(contents, -1)
 					for _, foundItem := range foundItems {
-						handleQuery(client, item.table, item.csvWriter, string(foundItem), item.query)
+						foundItemString := string(foundItem)
+						if item.validator(foundItemString) {
+							handleQuery(client, item.table, item.csvWriter, foundItemString, item.query)
+						}
 					}
 				}
 			}
@@ -154,4 +161,21 @@ func CreateCsvWriter(filename string, suffix string) *csv.Writer {
 	}
 
 	return csv.NewWriter(writer)
+}
+
+func ValidateDomain(domain string) bool {
+	ipCompiledRegex, _ := regexp.Compile(commonregex.Ip)
+	if ipCompiledRegex.MatchString(domain) {
+		return false
+	}
+
+	return true
+}
+
+func ValidateIp(ip string) bool {
+	return true
+}
+
+func ValidateHash(hash string) bool {
+	return true
 }
