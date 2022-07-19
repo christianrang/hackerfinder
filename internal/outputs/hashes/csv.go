@@ -3,13 +3,7 @@ package hashes
 import (
 	"encoding/csv"
 	"strconv"
-
-	"github.com/christianrang/hackerfinder/pkg/vtsdk/hashes"
 )
-
-type Hashes struct {
-	VirusTotalHashes hashes.Response
-}
 
 func CreateHeaders() []string {
 	// Number of Columns: 6
@@ -35,10 +29,14 @@ func (_hashes Hashes) CreateRecord() []string {
 	}
 }
 
-func WriteRow(w *csv.Writer, row []string) error {
+func (_hashes Hashes) WriteRow(w *csv.Writer, createRecord func() []string) error {
+	return WriteRow(w, createRecord)
+}
+
+func WriteRow(w *csv.Writer, createRecord func() []string) error {
 	defer w.Flush()
 
-	if err := w.Write(row); err != nil {
+	if err := w.Write(createRecord()); err != nil {
 		return err
 	}
 

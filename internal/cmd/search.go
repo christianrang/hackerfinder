@@ -31,7 +31,8 @@ var (
 	csvFilename string
 	csvFile     *os.File
 	csvWriter   *csv.Writer
-	searchCmd   = &cobra.Command{
+
+	searchCmd = &cobra.Command{
 		Use:   "search [OPTIONS]",
 		Short: "searches virustotal and abuseaipdb",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -56,8 +57,6 @@ var (
 				t = outputIp.InitializeTable()
 			case len(hashes) > 0:
 				t = outputHashes.InitializeTable()
-			default:
-				t = outputIp.InitializeTable()
 			}
 
 			if csvFilename != "" {
@@ -76,13 +75,11 @@ var (
 				defer csvWriter.Flush()
 				switch {
 				case len(domains) > 0:
-					outputDomain.WriteRow(csvWriter, outputDomain.CreateHeaders())
+					outputDomain.WriteRow(csvWriter, outputDomain.CreateHeaders)
 				case len(ips) > 0:
-					outputIp.WriteRow(csvWriter, outputIp.CreateHeaders())
+					outputIp.WriteRow(csvWriter, outputIp.CreateHeaders)
 				case len(hashes) > 0:
-					outputHashes.WriteRow(csvWriter, outputHashes.CreateHeaders())
-				default:
-					outputIp.WriteRow(csvWriter, outputIp.CreateHeaders())
+					outputHashes.WriteRow(csvWriter, outputHashes.CreateHeaders)
 				}
 			}
 
@@ -152,52 +149,19 @@ func init() {
 
 func handleIp(client internal.Client, t table.Writer, csvW *csv.Writer) {
 	for _, ip := range ips {
-
-		resp, err := client.QueryIp(ip)
-
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		if csvW != nil {
-			outputIp.WriteRow(csvW, resp.CreateRecord())
-		}
-
-		resp.CreateTableRow(t)
+		handleQuery(client, t, csvWriter, ip, client.QueryIp)
 	}
 }
 
 func handleDomain(client internal.Client, t table.Writer, csvW *csv.Writer) {
 	for _, domain := range domains {
-
-		resp, err := client.QueryDomain(domain)
-
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		if csvW != nil {
-			outputIp.WriteRow(csvW, resp.CreateRecord())
-		}
-
-		resp.CreateTableRow(t)
+		handleQuery(client, t, csvWriter, domain, client.QueryDomain)
 	}
 }
 
 func handleHashes(client internal.Client, t table.Writer, csvW *csv.Writer) {
 	for _, hash := range hashes {
-
-		resp, err := client.QueryHashes(hash)
-
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		if csvW != nil {
-			outputIp.WriteRow(csvW, resp.CreateRecord())
-		}
-
-		resp.CreateTableRow(t)
+		handleQuery(client, t, csvWriter, hash, client.QueryHashes)
 	}
 }
 
@@ -211,19 +175,7 @@ func handleIpFile(client internal.Client, t table.Writer, csvW *csv.Writer) {
 		contents := strings.Split(string(data), "\n")
 
 		for _, ip := range contents {
-			if ip == "" {
-				break
-			}
-			resp, err := client.QueryIp(ip)
-			if err != nil {
-				fmt.Printf("error: failed to query ip: %s", err)
-			}
-
-			if csvW != nil {
-				outputIp.WriteRow(csvW, resp.CreateRecord())
-			}
-
-			resp.CreateTableRow(t)
+			handleQuery(client, t, csvWriter, ip, client.QueryIp)
 		}
 	}
 }
@@ -241,16 +193,7 @@ func handleDomainFile(client internal.Client, t table.Writer, csvW *csv.Writer) 
 			if domain == "" {
 				break
 			}
-			resp, err := client.QueryDomain(domain)
-			if err != nil {
-				fmt.Printf("error: failed to query domain: %s", err)
-			}
-
-			if csvW != nil {
-				outputIp.WriteRow(csvW, resp.CreateRecord())
-			}
-
-			resp.CreateTableRow(t)
+			handleQuery(client, t, csvWriter, domain, client.QueryIp)
 		}
 	}
 }
@@ -268,16 +211,7 @@ func handleHashesFile(client internal.Client, t table.Writer, csvW *csv.Writer) 
 			if hash == "" {
 				break
 			}
-			resp, err := client.QueryHashes(hash)
-			if err != nil {
-				fmt.Printf("error: failed to query ip: %s", err)
-			}
-
-			if csvW != nil {
-				outputIp.WriteRow(csvW, resp.CreateRecord())
-			}
-
-			resp.CreateTableRow(t)
+			handleQuery(client, t, csvWriter, hash, client.QueryIp)
 		}
 	}
 }

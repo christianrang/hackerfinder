@@ -3,6 +3,8 @@ package domain
 import (
 	"os"
 
+	outputTypes "github.com/christianrang/hackerfinder/internal/outputs/types"
+	"github.com/christianrang/hackerfinder/pkg/vtsdk/domain"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
@@ -13,6 +15,12 @@ var _tableHeaders = table.Row{
 	"VT H",
 	"VT U",
 }
+
+type Domain struct {
+	VirusTotalDomain domain.Response
+}
+
+var _ outputTypes.Output = (*Domain)(nil)
 
 func InitializeTable() table.Writer {
 	t := table.NewWriter()

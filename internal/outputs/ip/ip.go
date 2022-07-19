@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	outputTypes "github.com/christianrang/hackerfinder/internal/outputs/types"
 	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk/check"
 	"github.com/christianrang/hackerfinder/pkg/vtsdk/ipaddress"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -25,6 +26,8 @@ type Ip struct {
 	AbuseipdbCheck check.Response     `json:"abuseipdb_check"`
 	VirusTotalIp   ipaddress.Response `json:"vt_ip_address"`
 }
+
+var _ outputTypes.Output = (*Ip)(nil)
 
 func InitializeTable() table.Writer {
 	t := table.NewWriter()
