@@ -30,8 +30,7 @@ Uses VirusTotal to look up malicious things
 
 ## Configuration
 
-The program looks for configuration in `$HOME/.config` and `$PWD`.
-
+The program looks for configuration in `$HOME/.config` and `$PWD`. Configuration filename must be `badip.yaml`.
 ```yaml
 virustotal:
   api_key: { your VirusTotal api key}
