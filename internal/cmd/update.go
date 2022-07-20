@@ -13,7 +13,7 @@ import (
 var (
 	updateCommand = &cobra.Command{
 		Use:   "update",
-		Short: "updates the hackerfinder",
+		Short: "updates hackerfinder",
 		Run: func(cmd *cobra.Command, args []string) {
 			url, err := update.FindCurrentReleaseUrl()
 			if err != nil {
