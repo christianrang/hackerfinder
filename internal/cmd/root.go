@@ -14,9 +14,9 @@ var (
 	configurationFile string
 	configuration     internal.Configuration
 	rootCmd           = &cobra.Command{
-		Use:     "badip",
+		Use:     "hackerfinder",
 		Short:   "a script for quickly querying VirusTotal and Abuseipdb APIs",
-		Version: "v1.5.1",
+		Version: "v1.5.2",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 		},
@@ -37,7 +37,7 @@ func initConfig() {
 	} else {
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("$HOME/.config/")
-		viper.SetConfigName("badip")
+		viper.SetConfigName("hackerfinder")
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
