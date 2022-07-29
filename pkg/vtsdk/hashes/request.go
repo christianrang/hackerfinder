@@ -23,7 +23,7 @@ queryLoop:
 			SetResult(&response).
 			Get(_hashesPath + hash)
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("error in sending request %s: ", err))
+			return nil, errors.New(fmt.Sprintf("error querying for %s on VirusTotal: %s", hash, err))
 		}
 
 		switch resp.StatusCode() {

@@ -22,7 +22,7 @@ type Attributes struct {
 	Vhash                       string                                   `json:"vhash"`
 	Trid                        []Trid                                   `json:"trid"`
 	SignatureInfo               SignatureInfo                            `json:"signature_info"`
-	CreationDate                int                                      `json:"creation_date"`
+	CreationDate                int64                                    `json:"creation_date"`
 	Names                       []string                                 `json:"names"`
 	DotNetGuid                  DotNetGuid                               `json:"dot_net_guid"`
 	LastModificationDate        int                                      `json:"last_modification_date"`

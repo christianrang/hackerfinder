@@ -21,7 +21,7 @@ type Error struct {
 
 type Attributes struct {
 	Categories           Categories                     `json:"categories"`
-	CreationDate         int                            `json:"creation_date"`
+	CreationDate         int64                          `json:"creation_date"`
 	Favicon              Favicon                        `json:"favicon"`
 	LastAnalysisResults  responses.LastAnalysisResults  `json:"last_analysis_results"`
 	LastAnalysisStats    responses.LastAnalysisStats    `json:"last_analysis_stats"`
