@@ -16,7 +16,7 @@ var (
 	rootCmd           = &cobra.Command{
 		Use:     "hackerfinder",
 		Short:   "a script for quickly querying VirusTotal and Abuseipdb APIs",
-		Version: "v1.5.2",
+		Version: "v1.5.3",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 		},

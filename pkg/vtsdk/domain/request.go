@@ -23,7 +23,7 @@ queryLoop:
 			SetResult(&response).
 			Get(fmt.Sprintf(DomainReportUrlPath, domain))
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("error in sending request %s: ", err))
+			return nil, errors.New(fmt.Sprintf("error querying for %s on VirusTotal: %s", domain, err))
 		}
 
 		switch resp.StatusCode() {
