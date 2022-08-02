@@ -1,11 +1,11 @@
 package domain
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/christianrang/hackerfinder/pkg/vtsdk"
+	virusTotalErrors "github.com/christianrang/hackerfinder/pkg/vtsdk/errors"
 	resty "github.com/go-resty/resty/v2"
 )
 
@@ -23,7 +23,7 @@ queryLoop:
 			SetResult(&response).
 			Get(fmt.Sprintf(DomainReportUrlPath, domain))
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("error querying for %s on VirusTotal: %s", domain, err))
+			return nil, virusTotalErrors.NewQueryError(domain).Wrap(err)
 		}
 
 		switch resp.StatusCode() {

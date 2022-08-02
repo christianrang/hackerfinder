@@ -42,11 +42,10 @@ func TestQueryIp(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		resp, err := ipaddress.QueryIp(*test.client, test.param, test.response)
+		resp, err := ipaddress.Query(*test.client, test.param, test.response)
 		if err != nil {
 			t.Fatal(err)
 		}
-		t.Logf("%#v", test.response)
 		assert.Equal(t, test.expected, resp.StatusCode(), "they should be equal")
 	}
 }

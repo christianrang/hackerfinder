@@ -1,11 +1,10 @@
 package hashes
 
 import (
-	"errors"
-	"fmt"
 	"time"
 
 	"github.com/christianrang/hackerfinder/pkg/vtsdk"
+	virusTotalErrors "github.com/christianrang/hackerfinder/pkg/vtsdk/errors"
 	resty "github.com/go-resty/resty/v2"
 )
 
@@ -23,7 +22,7 @@ queryLoop:
 			SetResult(&response).
 			Get(_hashesPath + hash)
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("error querying for %s on VirusTotal: %s", hash, err))
+			return nil, virusTotalErrors.NewQueryError(hash).Wrap(err)
 		}
 
 		switch resp.StatusCode() {
