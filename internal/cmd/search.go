@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/christianrang/hackerfinder/internal"
+	"github.com/christianrang/hackerfinder/internal/hferrors"
 	outputDomain "github.com/christianrang/hackerfinder/internal/outputs/domain"
 	outputHashes "github.com/christianrang/hackerfinder/internal/outputs/hashes"
 	outputIp "github.com/christianrang/hackerfinder/internal/outputs/ip"
@@ -44,7 +45,7 @@ var (
 			}
 
 			if !configuration.Api.HasApiKey() {
-				fmt.Printf("error: please configure an API key\n")
+				fmt.Println(hferrors.ErrNoAPIKeyFound)
 				os.Exit(2)
 			}
 
@@ -61,13 +62,13 @@ var (
 
 			if csvFilename != "" {
 				if _, err := os.Stat(csvFilename); !errors.Is(err, os.ErrNotExist) {
-					fmt.Printf("error: file %s already exists. Please use a different filename.\n", csvFilename)
+					fmt.Println(hferrors.NewFileExistsError(csvFilename))
 					os.Exit(1)
 				}
 				csvFile, err := os.Create(csvFilename)
 				defer csvFile.Close()
 				if err != nil {
-					fmt.Printf("error: failed to create csv file %s: %s\n", csvFilename, err)
+					fmt.Println(hferrors.NewFailedFileCreationError(csvFilename).Wrap(err))
 					os.Exit(1)
 				}
 

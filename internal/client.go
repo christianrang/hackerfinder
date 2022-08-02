@@ -34,7 +34,7 @@ func (client *Client) QueryIp(_ip string) (outputTypes.Output, error) {
 
 	_, ok = client.VirusTotalClient.Resty.Header["X-Apikey"]
 	if ok {
-		_, err := ipaddress.QueryIp(*client.VirusTotalClient, _ip, &response.VirusTotalIp)
+		_, err := ipaddress.Query(*client.VirusTotalClient, _ip, &response.VirusTotalIp)
 		if err != nil {
 			return nil, err
 		}
