@@ -9,10 +9,13 @@ import (
 	"os"
 	"regexp"
 
+	mtable "github.com/calyptia/go-bubble-table"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/christianrang/hackerfinder/internal"
 	outputDomain "github.com/christianrang/hackerfinder/internal/outputs/domain"
 	outputHashes "github.com/christianrang/hackerfinder/internal/outputs/hashes"
 	outputIp "github.com/christianrang/hackerfinder/internal/outputs/ip"
+	"github.com/christianrang/hackerfinder/internal/outputs/ui"
 	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk"
 	commonregex "github.com/christianrang/hackerfinder/pkg/regex"
 	"github.com/christianrang/hackerfinder/pkg/vtsdk"
@@ -31,88 +34,104 @@ var (
 	ipCsvWriter     *csv.Writer
 	hashesCsvWriter *csv.Writer
 
+	results = make([]mtable.Row, 0)
+
 	filterCmd = &cobra.Command{
 		Use:   "filter [OPTIONS]",
 		Short: "filters and searches for domains, IPs and hashes",
 		Run: func(cmd *cobra.Command, args []string) {
-			if !configuration.Api.HasApiKey() {
-				fmt.Printf("error: please configure an API key\n")
-				os.Exit(2)
-			}
-
-			client := internal.Client{
-				VirusTotalClient: vtsdk.CreateClient(configuration.Api.VTConfig),
-				AbuseipdbClient:  abuseipdbsdk.CreateClient(configuration.Api.Abuseipdb),
-			}
-
-			domainTable = outputDomain.InitializeTable()
-			ipTable = outputIp.InitializeTable()
-			hashesTable = outputHashes.InitializeTable()
-
-			if csvFilename != "" {
-				// TODO clean up CSV creation and create a csv file for each artifact type
-				domainCsvWriter = CreateCsvWriter(csvFilename, ".domain")
-				ipCsvWriter = CreateCsvWriter(csvFilename, ".ips")
-				hashesCsvWriter = CreateCsvWriter(csvFilename, ".hashes")
-
-				outputDomain.WriteRow(domainCsvWriter, outputDomain.CreateHeaders)
-				outputIp.WriteRow(ipCsvWriter, outputIp.CreateHeaders)
-				outputHashes.WriteRow(hashesCsvWriter, outputHashes.CreateHeaders)
-			}
-
-			for _, filename := range filenames {
-				contents, err := ioutil.ReadFile(filename)
-				if err != nil {
-					fmt.Printf("error: opening file: %s\n", err)
-					os.Exit(3)
-				}
-				fmt.Println("Filtering ", filename)
-
-				items := []struct {
-					query     internal.QueryFunc
-					regex     string
-					table     table.Writer
-					csvWriter *csv.Writer
-					validator func(string) bool
-				}{
-					{
-						query:     client.QueryDomain,
-						regex:     commonregex.Domain,
-						table:     domainTable,
-						csvWriter: domainCsvWriter,
-						validator: ValidateDomain,
-					},
-					{
-						query:     client.QueryIp,
-						regex:     commonregex.Ip,
-						table:     ipTable,
-						csvWriter: ipCsvWriter,
-						validator: ValidateIp,
-					},
-					{
-						query:     client.QueryHashes,
-						regex:     commonregex.VirusTotalHashes,
-						table:     hashesTable,
-						csvWriter: hashesCsvWriter,
-						validator: ValidateHash,
-					},
+			go func() {
+				if !configuration.Api.HasApiKey() {
+					fmt.Printf("error: please configure an API key\n")
+					os.Exit(2)
 				}
 
-				for _, item := range items {
-					compiledRegex, _ := regexp.Compile(item.regex)
-					foundItems := compiledRegex.FindAll(contents, -1)
-					for _, foundItem := range foundItems {
-						foundItemString := string(foundItem)
-						if item.validator(foundItemString) {
-							handleQuery(client, item.table, item.csvWriter, foundItemString, item.query)
+				client := internal.Client{
+					VirusTotalClient: vtsdk.CreateClient(configuration.Api.VTConfig),
+					AbuseipdbClient:  abuseipdbsdk.CreateClient(configuration.Api.Abuseipdb),
+				}
+
+				domainTable = outputDomain.InitializeTable()
+				ipTable = outputIp.InitializeTable()
+				hashesTable = outputHashes.InitializeTable()
+
+				if csvFilename != "" {
+					// TODO clean up CSV creation and create a csv file for each artifact type
+					domainCsvWriter = CreateCsvWriter(csvFilename, ".domain")
+					ipCsvWriter = CreateCsvWriter(csvFilename, ".ips")
+					hashesCsvWriter = CreateCsvWriter(csvFilename, ".hashes")
+
+					outputDomain.WriteRow(domainCsvWriter, outputDomain.CreateHeaders)
+					outputIp.WriteRow(ipCsvWriter, outputIp.CreateHeaders)
+					outputHashes.WriteRow(hashesCsvWriter, outputHashes.CreateHeaders)
+				}
+
+				for _, filename := range filenames {
+					contents, err := ioutil.ReadFile(filename)
+					if err != nil {
+						fmt.Printf("error: opening file: %s\n", err)
+						os.Exit(3)
+					}
+					fmt.Println("Filtering ", filename)
+
+					items := []struct {
+						query     internal.QueryFunc
+						regex     string
+						table     table.Writer
+						csvWriter *csv.Writer
+						validator func(string) bool
+					}{
+						{
+							query:     client.QueryDomain,
+							regex:     commonregex.Domain,
+							table:     domainTable,
+							csvWriter: domainCsvWriter,
+							validator: ValidateDomain,
+						},
+						{
+							query:     client.QueryIp,
+							regex:     commonregex.Ip,
+							table:     ipTable,
+							csvWriter: ipCsvWriter,
+							validator: ValidateIp,
+						},
+						{
+							query:     client.QueryHashes,
+							regex:     commonregex.VirusTotalHashes,
+							table:     hashesTable,
+							csvWriter: hashesCsvWriter,
+							validator: ValidateHash,
+						},
+					}
+
+					for _, item := range items {
+						compiledRegex, _ := regexp.Compile(item.regex)
+						foundItems := compiledRegex.FindAll(contents, -1)
+						for _, foundItem := range foundItems {
+							foundItemString := string(foundItem)
+							if item.validator(foundItemString) {
+								handleQuery(client, item.table, item.csvWriter, foundItemString, item.query, p)
+							}
 						}
 					}
 				}
+
+				p.Quit()
+				domainTable.Render()
+				ipTable.Render()
+				hashesTable.Render()
+			}()
+
+			if err := p.Start(); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
 			}
 
-			domainTable.Render()
-			ipTable.Render()
-			hashesTable.Render()
+			n := tea.NewProgram(ui.InitTableModel(results))
+			if err := n.Start(); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		},
 	}
 )
@@ -134,7 +153,9 @@ func init() {
 	)
 }
 
-func handleQuery(client internal.Client, t table.Writer, csvW *csv.Writer, value string, query internal.QueryFunc) {
+func handleQuery(client internal.Client, t table.Writer, csvW *csv.Writer, value string, query internal.QueryFunc, p *tea.Program) {
+	p.Send(ui.QueryMsg{Target: value})
+
 	resp, err := client.Query(value, query)
 
 	if err != nil {
@@ -144,6 +165,13 @@ func handleQuery(client internal.Client, t table.Writer, csvW *csv.Writer, value
 	if csvW != nil {
 		resp.WriteRow(csvW, resp.CreateRecord)
 	}
+
+	cells := resp.CreateRecord()
+	var simpleRowCells = make(mtable.SimpleRow, len(cells))
+	for i, val := range cells {
+		simpleRowCells[i] = val
+	}
+	results = append(results, simpleRowCells)
 
 	resp.CreateTableRow(t)
 }
