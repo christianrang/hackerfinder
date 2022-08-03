@@ -34,7 +34,8 @@ var (
 	ipCsvWriter     *csv.Writer
 	hashesCsvWriter *csv.Writer
 
-	results = make([]mtable.Row, 0)
+	results    = make([]mtable.Row, 0)
+	resultsRow = make([][]string, 0)
 
 	filterCmd = &cobra.Command{
 		Use:   "filter [OPTIONS]",
@@ -116,9 +117,6 @@ var (
 				}
 
 				p.Quit()
-				domainTable.Render()
-				ipTable.Render()
-				hashesTable.Render()
 			}()
 
 			if err := p.Start(); err != nil {
@@ -126,7 +124,7 @@ var (
 				os.Exit(1)
 			}
 
-			n := tea.NewProgram(ui.InitTableModel(results))
+			n := tea.NewProgram(ui.InitTableModel(results, resultsRow))
 			if err := n.Start(); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -171,6 +169,7 @@ func handleQuery(client internal.Client, t table.Writer, csvW *csv.Writer, value
 		simpleRowCells[i] = val
 	}
 	results = append(results, simpleRowCells)
+	resultsRow = append(resultsRow, cells)
 
 	resp.CreateTableRow(t)
 }

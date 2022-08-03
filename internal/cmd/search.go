@@ -98,14 +98,13 @@ var (
 				handleHashesFile(client, t, csvWriter)
 
 				p.Quit()
-				t.Render()
 			}()
 
 			if err := p.Start(); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			n := tea.NewProgram(ui.InitTableModel(results))
+			n := tea.NewProgram(ui.InitTableModel(results, resultsRow))
 			if err := n.Start(); err != nil {
 				fmt.Println(err)
 				os.Exit(1)

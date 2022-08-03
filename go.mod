@@ -10,9 +10,11 @@ require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/jedib0t/go-pretty/v6 v6.3.1
 	github.com/minio/selfupdate v0.4.0
+	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.1
+	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467
 )
 
 require (
@@ -45,7 +47,6 @@ require (
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
-	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
