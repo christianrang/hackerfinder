@@ -55,8 +55,6 @@ var (
 					os.Exit(2)
 				}
 
-				fmt.Println("Searching...")
-
 				switch {
 				case len(domains) > 0:
 					t = outputDomain.InitializeTable()

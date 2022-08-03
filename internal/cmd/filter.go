@@ -72,7 +72,6 @@ var (
 						fmt.Printf("error: opening file: %s\n", err)
 						os.Exit(3)
 					}
-					fmt.Println("Filtering ", filename)
 
 					items := []struct {
 						query     internal.QueryFunc
