@@ -55,15 +55,6 @@ var (
 					os.Exit(2)
 				}
 
-				switch {
-				case len(domains) > 0:
-					t = outputDomain.InitializeTable()
-				case len(ips) > 0:
-					t = outputIp.InitializeTable()
-				case len(hashes) > 0:
-					t = outputHashes.InitializeTable()
-				}
-
 				if csvFilename != "" {
 					if _, err := os.Stat(csvFilename); !errors.Is(err, os.ErrNotExist) {
 						fmt.Println(hferrors.NewFileExistsError(csvFilename))
@@ -104,7 +95,7 @@ var (
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			n := tea.NewProgram(ui.InitTableModel(results, resultsRow))
+			n := tea.NewProgram(ui.InitTableModel(results))
 			if err := n.Start(); err != nil {
 				fmt.Println(err)
 				os.Exit(1)

@@ -1,14 +1,15 @@
 package domain
 
 import (
-	"os"
+	"io"
 
+	table "github.com/calyptia/go-bubble-table"
 	outputTypes "github.com/christianrang/hackerfinder/internal/outputs/types"
 	"github.com/christianrang/hackerfinder/pkg/vtsdk/domain"
-	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/pkg/browser"
 )
 
-var _tableHeaders = table.Row{
+var _tableHeaders = []string{
 	"Domain",
 	"VT M",
 	"VT S",
@@ -22,21 +23,20 @@ type Domain struct {
 
 var _ outputTypes.Output = (*Domain)(nil)
 
-func InitializeTable() table.Writer {
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(_tableHeaders)
-	t.AppendSeparator()
-	return t
+func (d Domain) CreateTableRow() table.SimpleRow {
+	return table.SimpleRow{
+		d.VirusTotalDomain.Data.Id,
+		d.VirusTotalDomain.Data.Attributes.LastAnalysisStats.Malicious,
+		d.VirusTotalDomain.Data.Attributes.LastAnalysisStats.Suspicious,
+		d.VirusTotalDomain.Data.Attributes.LastAnalysisStats.Harmless,
+		d.VirusTotalDomain.Data.Attributes.LastAnalysisStats.Undetected,
+	}
 }
 
-func (_domain Domain) CreateTableRow(t table.Writer) {
-	t.AppendRow([]interface{}{
-		_domain.VirusTotalDomain.Data.Id,                                      // IP
-		_domain.VirusTotalDomain.Data.Attributes.LastAnalysisStats.Malicious,  // VT M
-		_domain.VirusTotalDomain.Data.Attributes.LastAnalysisStats.Suspicious, // VT S
-		_domain.VirusTotalDomain.Data.Attributes.LastAnalysisStats.Harmless,   // VT H
-		_domain.VirusTotalDomain.Data.Attributes.LastAnalysisStats.Undetected, // VT U
-	})
-	t.AppendSeparator()
+func (d Domain) OpenGui() {
+	// We don't care about these and the goof the UI
+	browser.Stderr = io.Discard
+	browser.Stdout = io.Discard
+
+	browser.OpenURL(domain.CreateGuiUrl(d.VirusTotalDomain.Data.Id))
 }

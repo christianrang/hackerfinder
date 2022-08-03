@@ -7,9 +7,13 @@ import (
 )
 
 var (
-	AbuseipdbAddressUrl = url.URL{
+	BaseApiUrl = url.URL{
 		Scheme: "https",
 		Host:   "api.abuseipdb.com",
+	}
+	BaseUrl = url.URL{
+		Scheme: "https",
+		Host:   "abuseipdb.com",
 	}
 )
 
@@ -21,7 +25,7 @@ func CreateClient(c Configuration) *Client {
 	client := &Client{
 		Resty: resty.New().
 			SetHeader("Key", c.ApiKey).
-			SetBaseURL(AbuseipdbAddressUrl.String()),
+			SetBaseURL(BaseApiUrl.String()),
 	}
 
 	return client

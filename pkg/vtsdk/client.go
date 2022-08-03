@@ -6,7 +6,7 @@ import (
 	resty "github.com/go-resty/resty/v2"
 )
 
-var VtIpAddressUrl = url.URL{
+var VirusTotalBaseUrl = url.URL{
 	Scheme: "https",
 	Host:   "www.virustotal.com",
 }
@@ -19,7 +19,7 @@ func CreateClient(c Configuration) *Client {
 	client := &Client{
 		Resty: resty.New().
 			SetHeader("x-apikey", c.ApiKey).
-			SetBaseURL(VtIpAddressUrl.String()),
+			SetBaseURL(VirusTotalBaseUrl.String()),
 	}
 
 	return client

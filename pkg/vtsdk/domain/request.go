@@ -9,7 +9,10 @@ import (
 	resty "github.com/go-resty/resty/v2"
 )
 
-var DomainReportUrlPath = "/api/v3/domains/%s"
+var (
+	DomainReportUrlPath = "/api/v3/domains/%s"
+	domainGuiPath       = "/gui/domain/%s"
+)
 
 func Query(client vtsdk.Client, domain string, response *Response) (*resty.Response, error) {
 	var (
@@ -36,4 +39,8 @@ queryLoop:
 		}
 	}
 	return resp, err
+}
+
+func CreateGuiUrl(target string) string {
+	return vtsdk.VirusTotalBaseUrl.String() + fmt.Sprintf(domainGuiPath, target)
 }

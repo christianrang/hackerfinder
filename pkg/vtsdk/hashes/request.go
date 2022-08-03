@@ -1,6 +1,7 @@
 package hashes
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/christianrang/hackerfinder/pkg/vtsdk"
@@ -8,7 +9,10 @@ import (
 	resty "github.com/go-resty/resty/v2"
 )
 
-var _hashesPath = "/api/v3/files/"
+var (
+	_hashesPath = "/api/v3/files/"
+	hashGuiPath = "/gui/file/%s"
+)
 
 func Query(client vtsdk.Client, hash string, response *Response) (*resty.Response, error) {
 	var (
@@ -35,4 +39,8 @@ queryLoop:
 		}
 	}
 	return resp, err
+}
+
+func CreateGuiUrl(target string) string {
+	return vtsdk.VirusTotalBaseUrl.String() + fmt.Sprintf(hashGuiPath, target)
 }

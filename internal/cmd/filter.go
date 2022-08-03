@@ -9,12 +9,12 @@ import (
 	"os"
 	"regexp"
 
-	mtable "github.com/calyptia/go-bubble-table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/christianrang/hackerfinder/internal"
 	outputDomain "github.com/christianrang/hackerfinder/internal/outputs/domain"
 	outputHashes "github.com/christianrang/hackerfinder/internal/outputs/hashes"
 	outputIp "github.com/christianrang/hackerfinder/internal/outputs/ip"
+	outputTypes "github.com/christianrang/hackerfinder/internal/outputs/types"
 	"github.com/christianrang/hackerfinder/internal/outputs/ui"
 	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk"
 	commonregex "github.com/christianrang/hackerfinder/pkg/regex"
@@ -34,8 +34,7 @@ var (
 	ipCsvWriter     *csv.Writer
 	hashesCsvWriter *csv.Writer
 
-	results    = make([]mtable.Row, 0)
-	resultsRow = make([][]string, 0)
+	results = make([]outputTypes.Output, 0)
 
 	filterCmd = &cobra.Command{
 		Use:   "filter [OPTIONS]",
@@ -51,10 +50,6 @@ var (
 					VirusTotalClient: vtsdk.CreateClient(configuration.Api.VTConfig),
 					AbuseipdbClient:  abuseipdbsdk.CreateClient(configuration.Api.Abuseipdb),
 				}
-
-				domainTable = outputDomain.InitializeTable()
-				ipTable = outputIp.InitializeTable()
-				hashesTable = outputHashes.InitializeTable()
 
 				if csvFilename != "" {
 					// TODO clean up CSV creation and create a csv file for each artifact type
@@ -124,7 +119,7 @@ var (
 				os.Exit(1)
 			}
 
-			n := tea.NewProgram(ui.InitTableModel(results, resultsRow))
+			n := tea.NewProgram(ui.InitTableModel(results))
 			if err := n.Start(); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -163,15 +158,7 @@ func handleQuery(client internal.Client, t table.Writer, csvW *csv.Writer, value
 		resp.WriteRow(csvW, resp.CreateRecord)
 	}
 
-	cells := resp.CreateRecord()
-	var simpleRowCells = make(mtable.SimpleRow, len(cells))
-	for i, val := range cells {
-		simpleRowCells[i] = val
-	}
-	results = append(results, simpleRowCells)
-	resultsRow = append(resultsRow, cells)
-
-	resp.CreateTableRow(t)
+	results = append(results, resp)
 }
 
 func CreateCsvWriter(filename string, suffix string) *csv.Writer {

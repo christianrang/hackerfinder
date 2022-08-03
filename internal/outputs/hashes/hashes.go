@@ -1,14 +1,15 @@
 package hashes
 
 import (
-	"os"
+	"io"
 
+	table "github.com/calyptia/go-bubble-table"
 	outputTypes "github.com/christianrang/hackerfinder/internal/outputs/types"
 	"github.com/christianrang/hackerfinder/pkg/vtsdk/hashes"
-	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/pkg/browser"
 )
 
-var _tableHeaders = table.Row{
+var _tableHeaders = []string{
 	"Hashes",
 	"VT M",
 	"VT S",
@@ -22,21 +23,20 @@ type Hashes struct {
 
 var _ outputTypes.Output = (*Hashes)(nil)
 
-func InitializeTable() table.Writer {
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(_tableHeaders)
-	t.AppendSeparator()
-	return t
+func (h Hashes) CreateTableRow() table.SimpleRow {
+	return table.SimpleRow{
+		h.VirusTotalHashes.Data.Id,                                      // IP
+		h.VirusTotalHashes.Data.Attributes.LastAnalysisStats.Malicious,  // VT M
+		h.VirusTotalHashes.Data.Attributes.LastAnalysisStats.Suspicious, // VT S
+		h.VirusTotalHashes.Data.Attributes.LastAnalysisStats.Harmless,   // VT H
+		h.VirusTotalHashes.Data.Attributes.LastAnalysisStats.Undetected, // VT U
+	}
 }
 
-func (_hashes Hashes) CreateTableRow(t table.Writer) {
-	t.AppendRow([]interface{}{
-		_hashes.VirusTotalHashes.Data.Id,                                      // IP
-		_hashes.VirusTotalHashes.Data.Attributes.LastAnalysisStats.Malicious,  // VT M
-		_hashes.VirusTotalHashes.Data.Attributes.LastAnalysisStats.Suspicious, // VT S
-		_hashes.VirusTotalHashes.Data.Attributes.LastAnalysisStats.Harmless,   // VT H
-		_hashes.VirusTotalHashes.Data.Attributes.LastAnalysisStats.Undetected, // VT U
-	})
-	t.AppendSeparator()
+func (h Hashes) OpenGui() {
+	// We don't care about these and the goof the UI
+	browser.Stderr = io.Discard
+	browser.Stdout = io.Discard
+
+	browser.OpenURL(hashes.CreateGuiUrl(h.VirusTotalHashes.Data.Id))
 }

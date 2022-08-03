@@ -2,15 +2,16 @@ package ip
 
 import (
 	"fmt"
-	"os"
+	"io"
 
+	table "github.com/calyptia/go-bubble-table"
 	outputTypes "github.com/christianrang/hackerfinder/internal/outputs/types"
 	"github.com/christianrang/hackerfinder/pkg/abuseipdbsdk/check"
 	"github.com/christianrang/hackerfinder/pkg/vtsdk/ipaddress"
-	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/pkg/browser"
 )
 
-var _tableHeaders = table.Row{
+var _tableHeaders = []string{
 	"IP",
 	"VT M",
 	"VT S",
@@ -29,16 +30,8 @@ type Ip struct {
 
 var _ outputTypes.Output = (*Ip)(nil)
 
-func InitializeTable() table.Writer {
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(_tableHeaders)
-	t.AppendSeparator()
-	return t
-}
-
-func (ip Ip) CreateTableRow(t table.Writer) {
-	t.AppendRow([]interface{}{
+func (ip Ip) CreateTableRow() table.SimpleRow {
+	return table.SimpleRow{
 		ip.VirusTotalIp.Data.Id, // IP
 		ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Malicious,  // VT M
 		ip.VirusTotalIp.Data.Attributes.LastAnalysisStats.Suspicious, // VT S
@@ -48,6 +41,14 @@ func (ip Ip) CreateTableRow(t table.Writer) {
 		ip.AbuseipdbCheck.Data.TotalReports,                          // AbuseIp Report Count
 		ip.AbuseipdbCheck.Data.NumDistinctUsers,                      // AbuseIp Users
 		ip.AbuseipdbCheck.Data.Hostnames.String(),                    // AbuseIp Hostnames
-	})
-	t.AppendSeparator()
+	}
+}
+
+func (ip Ip) OpenGui() {
+	// We don't care about these and the goof the UI
+	browser.Stderr = io.Discard
+	browser.Stdout = io.Discard
+
+	browser.OpenURL(ipaddress.CreateGuiUrl(ip.VirusTotalIp.Data.Id))
+	browser.OpenURL(check.CreateGuiUrl(ip.AbuseipdbCheck.Data.IpAddress))
 }

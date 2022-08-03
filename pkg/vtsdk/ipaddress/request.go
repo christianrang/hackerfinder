@@ -9,7 +9,10 @@ import (
 	resty "github.com/go-resty/resty/v2"
 )
 
-var _ipAddressPath = "/api/v3/ip_addresses/%s"
+var (
+	_ipAddressPath   = "/api/v3/ip_addresses/%s"
+	ipAddressGuiPath = "/gui/ip-address/%s"
+)
 
 func Query(client vtsdk.Client, ip string, response *Response) (*resty.Response, error) {
 	var (
@@ -35,4 +38,8 @@ queryLoop:
 	}
 
 	return resp, err
+}
+
+func CreateGuiUrl(target string) string {
+	return vtsdk.VirusTotalBaseUrl.String() + fmt.Sprintf(ipAddressGuiPath, target)
 }

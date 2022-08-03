@@ -9,7 +9,10 @@ import (
 	resty "github.com/go-resty/resty/v2"
 )
 
-const _abuseipdbCheckUrlPath = "/api/v2/check/?ipAddress=%s"
+const (
+	_abuseipdbCheckUrlPath = "/api/v2/check/?ipAddress=%s"
+	checkGuiPath           = "/check/%s"
+)
 
 func QueryCheck(client abuseipdbsdk.Client, ip string, response *Response) (*resty.Response, error) {
 
@@ -34,4 +37,8 @@ func QueryCheck(client abuseipdbsdk.Client, ip string, response *Response) (*res
 	}
 
 	return resp, nil
+}
+
+func CreateGuiUrl(target string) string {
+	return abuseipdbsdk.BaseUrl.String() + fmt.Sprintf(checkGuiPath, target)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/pkg/browser"
+	outputTypes "github.com/christianrang/hackerfinder/internal/outputs/types"
 	"golang.org/x/term"
 )
 
@@ -21,7 +21,7 @@ type model struct {
 
 type tableModel struct {
 	table table.Model
-	rows  [][]string
+	rows  []outputTypes.Output
 }
 
 type QueryMsg struct {
@@ -39,7 +39,7 @@ var (
 	styleDoc = lipgloss.NewStyle().Padding(1)
 )
 
-func InitTableModel(rows []table.Row, rowsString [][]string) tableModel {
+func InitTableModel(rows []outputTypes.Output) tableModel {
 	w, h, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		w = 80
@@ -50,9 +50,13 @@ func InitTableModel(rows []table.Row, rowsString [][]string) tableModel {
 	h = h - top - bottom
 	t := table.New([]string{"IP", "VT Mal", "VT Sus", "VT Hrmls", "VT Unkn", "VT Rep", "VT Country", "VT Continent", "AbuseIp Conf Score", "AbuseIp Reports", "AbuseIp Users", "AbuseIp Hostnames"}, w, h)
 
-	t.SetRows(rows)
+	var tmp []table.Row
+	for _, item := range rows {
+		tmp = append(tmp, item.CreateTableRow())
+	}
+	t.SetRows(tmp)
 
-	return tableModel{table: t, rows: rowsString}
+	return tableModel{table: t, rows: rows}
 }
 
 func (m model) Init() tea.Cmd {
@@ -66,9 +70,8 @@ func (m tableModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		case tea.KeyEnter.String():
-			target := m.rows[m.table.Cursor()][0]
-			browser.OpenURL("https://virustotal.com/gui/ip-address/" + target)
-			browser.OpenURL("https://abuseipdb.com/check/" + target)
+			target := m.rows[m.table.Cursor()]
+			target.OpenGui()
 		}
 	}
 	var cmd tea.Cmd
