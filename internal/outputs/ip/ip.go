@@ -45,7 +45,7 @@ func (ip Ip) CreateTableRow() table.SimpleRow {
 }
 
 func (ip Ip) OpenGui() {
-	// We don't care about these and the goof the UI
+	// We don't care about these and they goof the UI
 	browser.Stderr = io.Discard
 	browser.Stdout = io.Discard
 

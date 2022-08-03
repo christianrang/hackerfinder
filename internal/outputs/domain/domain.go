@@ -34,7 +34,7 @@ func (d Domain) CreateTableRow() table.SimpleRow {
 }
 
 func (d Domain) OpenGui() {
-	// We don't care about these and the goof the UI
+	// We don't care about these and they goof the UI
 	browser.Stderr = io.Discard
 	browser.Stdout = io.Discard
 
